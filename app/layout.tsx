@@ -23,11 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-screen">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased dark h-full flex flex-col`}
       >
-        {children}
+        <header className="flex justify-center items-center py-8 px-4 border-b border-primary">
+          <h1 className="text-3xl font-semibold highlighted-title">
+            Text summarizer
+          </h1>
+        </header>
+        <main className="flex items-center justify-center h-full">
+          {children}
+        </main>
       </body>
     </html>
   );
