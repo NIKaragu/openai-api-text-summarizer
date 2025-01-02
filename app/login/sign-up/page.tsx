@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 
 export default function Page() {
   return (
@@ -13,7 +12,7 @@ export default function Page() {
           className="text-2xl font-semibold pb-2 border-b border-primary highlighted-title"
           aria-label="Log in form`s name"
         >
-          Log in
+          Sign up
         </h2>
         <form
           className="flex flex-col gap-6 mt-4 w-80"
@@ -49,6 +48,21 @@ export default function Page() {
               aria-labelledby="password-field"
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <Label
+              className="highlighted-label text-md"
+              aria-label="Password confirmation field"
+              id="password-confirmation-field"
+            >
+              Confirm password
+            </Label>
+            <Input
+              type="password"
+              placeholder="Confirm your assword"
+              name="password-confirmation"
+              aria-labelledby="password-confirmation-field"
+            />
+          </div>
           <Button
             type="submit"
             variant="outline-light"
@@ -56,15 +70,9 @@ export default function Page() {
             aria-label="Submit button"
             aria-description="Disabled until the form is filled"
           >
-            Log in
+            Sign up
           </Button>
         </form>
-        <Link
-          href={"./login/sign-up"}
-          className="text-sm text-foreground hover:text-muted-foreground transition-colors"
-        >
-          Don`t have an account?
-        </Link>
       </div>
     </>
   );
