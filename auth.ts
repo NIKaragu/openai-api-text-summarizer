@@ -35,6 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .object({ username: z.string().min(2), password: z.string().min(8) })
           .safeParse(credentials);
 
+
         if (parsedCredentials.success) {
           const { username, password } = parsedCredentials.data;
 
@@ -52,12 +53,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   username: user.username || `${user.id}`,
                 };
               }
-              // eslint-disable-next-line no-console
-              console.error("Password is invalid");
             }
           }
-          // eslint-disable-next-line no-console
-          console.error("User not found");
         }
         return null;
       },
