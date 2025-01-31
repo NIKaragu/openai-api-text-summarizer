@@ -39,3 +39,11 @@ export async function authenticate(
     };
   }
 }
+
+export async function signInWithGoogle() {
+  await signIn("google", { callbackUrl: "/conversation" });
+}
+
+export async function signInWithGithub() {
+  await signIn("github", { callbackUrl: "/conversation" });
+}

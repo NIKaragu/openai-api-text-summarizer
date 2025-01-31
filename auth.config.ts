@@ -1,4 +1,5 @@
 import { NextAuthConfig } from "next-auth";
+import { authRoutes } from "./lib/auth/authRoutes";
 
 export const authConfig = {
   session: {
@@ -9,6 +10,13 @@ export const authConfig = {
     async authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnConvesationPage = nextUrl.pathname.startsWith("/conversation");
+      const isAuthRoute = authRoutes.some(
+        (route) => nextUrl.pathname === route
+      );
+
+      if (isAuthRoute) {
+        return true;
+      }
 
       if (isOnConvesationPage) {
         if (isLoggedIn) {

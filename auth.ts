@@ -4,6 +4,8 @@ import { getUser } from "./lib/getUser";
 import bcryptjs from "bcryptjs";
 import { SignInSchema } from "./lib/auth/schemas/sign-in";
 import { authConfig } from "./auth.config";
+import Google from "next-auth/providers/google";
+import GitHub from "next-auth/providers/github"
 
 declare module "next-auth" {
   interface User {
@@ -58,5 +60,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return null;
       },
     }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    })
   ],
 });
