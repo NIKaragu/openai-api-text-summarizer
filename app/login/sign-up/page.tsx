@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signUp, SignUpState } from "@/lib/auth/sign-up";
+import { signUp } from "@/lib/auth/sign-up";
+import { SignUpState } from "@/lib/auth/types/sign-up";
 import { useActionState } from "react";
 
 export default function Page() {
   const initialActionState: SignUpState = { errors: {}, message: null };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [state, formAction, isPending] = useActionState<SignUpState, FormData>(
     signUp,
     initialActionState
@@ -32,6 +34,7 @@ export default function Page() {
               className="highlighted-label text-md"
               aria-label="Username field"
               id="username-field"
+              htmlFor="username"
             >
               Username
             </Label>
@@ -47,6 +50,7 @@ export default function Page() {
               className="highlighted-label text-md"
               aria-label="Password field"
               id="password-field"
+              htmlFor="password"
             >
               Password
             </Label>
@@ -62,6 +66,7 @@ export default function Page() {
               className="highlighted-label text-md"
               aria-label="Password confirmation field"
               id="password-confirmation-field"
+              htmlFor="confirmPassword"
             >
               Confirm password
             </Label>
@@ -75,7 +80,6 @@ export default function Page() {
           <Button
             type="submit"
             variant="outline-light"
-            size="default"
             aria-label="Submit button"
             aria-description="Disabled until the form is filled"
           >

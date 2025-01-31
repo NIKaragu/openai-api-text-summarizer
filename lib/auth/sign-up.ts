@@ -1,28 +1,11 @@
 "use server";
 
 import bcryptjs from "bcryptjs";
-import { z } from "zod";
 import { getUser } from "../getUser";
 import { prisma } from "../prisma-client/prisma-client";
 import { signIn } from "@/auth";
-
-const SignUpSchema = z.object({
-  username: z
-    .string()
-    .min(2, "Username should be at least 2 characters long")
-    .max(20, "Username should be less than 30 characters long"),
-  password: z.string().min(8, "Password should be at least 8 characters long"),
-  confirmPassword: z.string(),
-});
-
-export type SignUpState = {
-  errors?: {
-    username?: string[];
-    password?: string[];
-    confirmPAssword?: string[];
-  };
-  message?: string | null;
-};
+import { SignUpSchema } from "./schemas/sign-up";
+import { SignUpState } from "./types/sign-up";
 
 export async function signUp(state: SignUpState, formData: FormData) {
   const validatedFields = SignUpSchema.safeParse({
@@ -60,7 +43,11 @@ export async function signUp(state: SignUpState, formData: FormData) {
     },
   });
 
-  await signIn("credentials", formData);
+  await signIn("credentials", {
+    username,
+    password,
+    redirectTo: "/conversation",
+  });
 
   return { success: true, user: user };
 }

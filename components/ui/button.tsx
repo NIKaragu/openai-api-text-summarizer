@@ -28,10 +28,16 @@ const buttonVariants = cva(
         lg: "h-10 rounded-md px-8",
         icon: "h-9 w-9",
       },
+      font: {
+        default: "font-semibold",
+        medium: "font-medium",
+        bold: "font-bold",
+      }
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      font: "default",
     },
   },
 );

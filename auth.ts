@@ -1,12 +1,13 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { z } from "zod";
 import { getUser } from "./lib/getUser";
 import bcryptjs from "bcryptjs";
+import { SignInSchema } from "./lib/auth/schemas/sign-in";
+import { authConfig } from "./auth.config";
 
 declare module "next-auth" {
   interface User {
-    id: string;
+    id?: string;
     username: string;
   }
 
@@ -19,11 +20,12 @@ declare module "next-auth" {
 
   interface JWT {
     id: string;
-    name: string;
+    username: string;
   }
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -31,10 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       async authorize(credentials) {
-        const parsedCredentials = z
-          .object({ username: z.string().min(2), password: z.string().min(8) })
-          .safeParse(credentials);
-
+        const parsedCredentials = SignInSchema.safeParse(credentials);
 
         if (parsedCredentials.success) {
           const { username, password } = parsedCredentials.data;
@@ -60,30 +59,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-      } else {
-        token = {};
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.username = token.name as string;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
-  },
-  secret: process.env.AUTH_SECRET,
 });
