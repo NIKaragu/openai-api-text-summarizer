@@ -8,7 +8,7 @@ export const authConfig = {
   },
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
+      const isLoggedIn = !!auth?.user || !!auth?.account
       const isOnConversationPage = nextUrl.pathname.startsWith("/conversation");
       const isAuthRoute = authRoutes.some(
         (route) => nextUrl.pathname === route
@@ -36,6 +36,7 @@ export const authConfig = {
         token.username = user.username ?? `user_${user.id}`;
       }
       if (account) {
+        token.id = account.userId
         token.provider = account.provider;
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
