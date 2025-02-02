@@ -41,9 +41,9 @@ export async function authenticate(
 }
 
 export async function signInWithGoogle() {
-  await signIn("google", { callbackUrl: "/conversation" });
+  await signIn("google", { redirectTo: "/conversation", redirect: true });
 }
 
 export async function signInWithGithub() {
-  await signIn("github", { callbackUrl: "/conversation" });
+  await signIn("github", { redirectTo: "/conversation", redirect: true });
 }

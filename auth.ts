@@ -5,24 +5,25 @@ import bcryptjs from "bcryptjs";
 import { SignInSchema } from "./lib/auth/schemas/sign-in";
 import { authConfig } from "./auth.config";
 import Google from "next-auth/providers/google";
-import GitHub from "next-auth/providers/github"
+import GitHub from "next-auth/providers/github";
+import { prisma } from "./lib/prisma-client/prisma-client";
 
 declare module "next-auth" {
   interface User {
     id?: string;
-    username: string;
+    username?: string;
   }
 
   interface Session {
     user: {
       id: string;
-      username: string;
+      username?: string;
     };
   }
 
   interface JWT {
     id: string;
-    username: string;
+    username?: string;
   }
 }
 
@@ -51,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               if (isPasswordValid) {
                 return {
                   ...user,
-                  username: user.username || `${user.id}`,
+                  username: user.username || `user_${user.id}`,
                 };
               }
             }
@@ -63,10 +64,61 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      async profile(profile) {
+        const user = await prisma.user.upsert({
+          where: { username: profile.email },
+          update: {},
+          create: {
+            username: profile.email,
+            email: profile.email,
+            emailVerified: profile.email_verified,
+            accounts: {
+              create: {
+                provider: "google",
+                providerAccountId: String(profile.id),
+                access_token: profile.access_token
+                  ? String(profile.access_token)
+                  : null,
+                refresh_token: profile.refresh_token
+                  ? String(profile.refresh_token)
+                  : null,
+                type: "oauth",
+                expires_at: profile.exp,
+              },
+            },
+          },
+        });
+
+        return user;
+      },
     }),
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    })
+      async profile(profile) {
+        const user = await prisma.user.upsert({
+          where: { username: profile.login },
+          update: {},
+          create: {
+            username: profile.login,
+            accounts: {
+              create: {
+                provider: "github",
+                providerAccountId: String(profile.id),
+                access_token: profile.access_token
+                  ? String(profile.access_token)
+                  : null,
+                refresh_token: profile.refresh_token
+                  ? String(profile.refresh_token)
+                  : null,
+                type: "oauth",
+              },
+            },
+          },
+        });
+
+        return user;
+      },
+    }),
   ],
 });

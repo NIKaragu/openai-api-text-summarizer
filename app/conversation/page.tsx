@@ -8,7 +8,7 @@ export default async function Page() {
       <form
         action={async () => {
           "use server";
-          await signOut();
+          await signOut({ redirect: true, redirectTo: "/" });
         }}
       >
         <Button
@@ -18,7 +18,7 @@ export default async function Page() {
           aria-label="Submit button"
           aria-description="Disabled until the form is filled"
         >
-         Sign Out
+          Sign Out
         </Button>
       </form>
     </div>
