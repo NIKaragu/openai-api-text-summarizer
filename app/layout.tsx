@@ -28,8 +28,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark h-full flex flex-col`}
       >
         <header className="flex justify-center items-center py-8 px-4 border-b border-primary">
-          <h1 className="text-3xl font-semibold highlighted-title">
-            Text summarizer
+          <h1 className="text-4xl font-semibold highlighted-title">
+            Touch to AI
           </h1>
         </header>
         <main className="flex items-center justify-center h-full">

@@ -14,55 +14,82 @@ datasource db {
 }
 
 model User {
-  id    String    @id @default(uuid())
-  username String? @unique
-  email    String? @unique
-  password String? 
-  chats Chat[]
-  accounts Account[]
-  createdAt DateTime @default(now())
+  id            String    @id @default(uuid())
+  username      String   @unique
+  email         String?          @unique
+  emailVerified Boolean?
+  password      String?  
+  accounts      Account[]
+  sessions      Session[]
+  chats         Chat[]
+  
+  createdAt     DateTime  @default(now())
 
   @@map("Users")
 }
 
 model Account {
-  id Int @id @default(autoincrement())
-  userId String
-  owner User @relation(fields: [userId], references: [id])
-  provider Provider
+  userId            String
+  type              String
+  provider          String
   providerAccountId String
-  accessToken String
-  refreshToken String?
-  expiresAt Int? // (UNIX timestamp)
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  
+  createdAt        DateTime @default(now())
 
-  @@index([userId], name: "user_accounts")
-  @@unique([provider, providerAccountId])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
   @@map("Accounts")
 }
 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+
+  @@map("Sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("VerificationTokens")
+}
+
 model Chat {
-  id    Int    @id @default(autoincrement())
-  chatName  String @default("Chat")
-  userId String
-  owner User @relation(fields: [userId], references: [id])
+  id       Int    @id @default(autoincrement())
+  chatName String @default("Chat")
+  userId   String
+  owner    User   @relation(fields: [userId], references: [id])
   messages Message[]
-  
+
   createdAt DateTime @default(now())
 
   @@index([userId], name: "user_chats")
   @@map("Chats")
 }
 
-
-
 model Message {
-  id Int @default(autoincrement())
-  chatId Int
-  chat Chat @relation(fields: [chatId], references: [id])
-  sender Sender
-  content String
+  id              Int    @default(autoincrement())
+  chatId          Int
+  chat            Chat   @relation(fields: [chatId], references: [id])
+  sender          Sender
+  content         String
   isVersionActive Boolean @default(true)
-  version Int @default(1)
+  version         Int @default(1)
 
   createdAt DateTime @default(now())  
 
@@ -74,7 +101,6 @@ model Message {
 enum Provider {
   Google
   Github
-  LinkedIn
 }
 
 enum Sender {

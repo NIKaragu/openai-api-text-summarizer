@@ -1,23 +1,13 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
-CREATE TYPE "Provider" AS ENUM ('Google', 'Github', 'LinkedIn');
+CREATE TYPE "Provider" AS ENUM ('Google', 'Github');
 
 -- CreateEnum
 CREATE TYPE "Sender" AS ENUM ('User', 'AI');
 
--- DropTable
-DROP TABLE "User";
-
 -- CreateTable
 CREATE TABLE "Users" (
     "id" TEXT NOT NULL,
-    "username" TEXT,
-    "email" TEXT,
+    "username" TEXT NOT NULL,
     "password" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -26,15 +16,37 @@ CREATE TABLE "Users" (
 
 -- CreateTable
 CREATE TABLE "Accounts" (
-    "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
-    "provider" "Provider" NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
     "providerAccountId" TEXT NOT NULL,
-    "accessToken" TEXT NOT NULL,
-    "refreshToken" TEXT,
-    "expiresAt" INTEGER,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Accounts_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Accounts_pkey" PRIMARY KEY ("provider","providerAccountId")
+);
+
+-- CreateTable
+CREATE TABLE "Sessions" (
+    "sessionToken" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "VerificationTokens" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "VerificationTokens_pkey" PRIMARY KEY ("identifier","token")
 );
 
 -- CreateTable
@@ -64,13 +76,7 @@ CREATE TABLE "Messages" (
 CREATE UNIQUE INDEX "Users_username_key" ON "Users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
-
--- CreateIndex
-CREATE INDEX "user_accounts" ON "Accounts"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Accounts_provider_providerAccountId_key" ON "Accounts"("provider", "providerAccountId");
+CREATE UNIQUE INDEX "Sessions_sessionToken_key" ON "Sessions"("sessionToken");
 
 -- CreateIndex
 CREATE INDEX "user_chats" ON "Chats"("userId");
@@ -79,7 +85,10 @@ CREATE INDEX "user_chats" ON "Chats"("userId");
 CREATE INDEX "active_messages" ON "Messages"("chatId", "isVersionActive");
 
 -- AddForeignKey
-ALTER TABLE "Accounts" ADD CONSTRAINT "Accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Accounts" ADD CONSTRAINT "Accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sessions" ADD CONSTRAINT "Sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Chats" ADD CONSTRAINT "Chats_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
