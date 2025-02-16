@@ -15,14 +15,36 @@ import { redirect } from "next/navigation";
 import { useActionState } from "react";
 import GoogleLogo from "@/public/google-logo.svg";
 import GithubLogo from "@/public/github-logo.svg";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
+  const { toast } = useToast();
+  const signInAction = async (prevState: SignInState, formData: FormData) => {
+    const result = await authenticate(prevState, formData);
+
+    if (result.errors) {
+      toast({
+        title: "Warning",
+        description: result.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: result.message,
+        variant: "successful",
+      });
+    }
+
+    return result;
+  };
+
   const initialActionState: SignInState = { errors: {}, message: null };
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [state, formAction, isPendingOnAuth] = useActionState<
+  const [credentialsState, credentialsAction, isPendingOnAuth] = useActionState<
     SignInState,
     FormData
-  >(authenticate, initialActionState);
+  >(signInAction, initialActionState);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [googleState, useGoogle, isPendingOnGoogle] = useActionState(
     signInWithGoogle,
@@ -47,7 +69,8 @@ export default function Page() {
           className="flex flex-col gap-6 mt-4 w-80"
           aria-label="Log in form"
           action={async (formData) => {
-            formAction(formData);
+            credentialsAction(formData);
+
             redirect("/conversation");
           }}
         >

@@ -3,19 +3,36 @@
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { SignInState } from "./types/sign-in";
+import { SignInSchema } from "./schemas/sign-in";
 
 export async function authenticate(
   state: SignInState,
   formData: FormData
 ): Promise<SignInState> {
+  const credentials = {
+    username: formData.get("username"),
+    password: formData.get("password"),
+  };
+  const parsedCredentials = SignInSchema.safeParse(credentials);
+  const isParsedSuccessfully = parsedCredentials.success;
+  const parsingErrors = parsedCredentials.error?.flatten().fieldErrors;
+  const USERNAME_ERROR = parsingErrors?.username && parsingErrors?.username[0];
+  const PASSWORD_ERROR = parsingErrors?.password && parsingErrors?.password[0];
+
+  if (!isParsedSuccessfully) {
+    return {
+      errors: parsingErrors,
+      message: USERNAME_ERROR || PASSWORD_ERROR,
+    };
+  }
+
   try {
     await signIn("credentials", {
-      username: formData.get("username"),
-      password: formData.get("password"),
+      ...credentials,
       redirect: false,
     });
 
-    return { errors: {}, message: "Successfully logged in!" };
+    return { message: "Successfully logged in!" };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -34,7 +51,7 @@ export async function authenticate(
       }
     }
     return {
-      errors: {},
+      errors: { username: ["Unexpected error occured"] },
       message: error as string,
     };
   }
