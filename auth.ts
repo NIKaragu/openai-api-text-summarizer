@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { getUser } from "./lib/getUser";
 import bcryptjs from "bcryptjs";
-import { SignInSchema } from "./lib/auth/schemas/sign-in";
 import { authConfig } from "./auth.config";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
@@ -40,25 +39,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       async authorize(credentials) {
-        const parsedCredentials = SignInSchema.safeParse(credentials);
+        const username = credentials.username as string;
+        const password = credentials.password as string;
 
-        if (parsedCredentials.success) {
-          const { username, password } = parsedCredentials.data;
+        const user = await getUser(username);
 
-          const user = await getUser(username);
-
-          if (user) {
-            if (user.password) {
-              const isPasswordValid = await bcryptjs.compare(
-                password,
-                user.password
-              );
-              if (isPasswordValid) {
-                return {
-                  ...user,
-                  username: user.username || `user_${user.id}`,
-                };
-              }
+        if (user) {
+          if (user.password) {
+            const isPasswordValid = await bcryptjs.compare(
+              password,
+              user.password
+            );
+            if (isPasswordValid) {
+              return {
+                ...user,
+                username: user.username || `user_${user.id}`,
+              };
             }
           }
         }

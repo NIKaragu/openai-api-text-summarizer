@@ -22,10 +22,21 @@ model User {
   accounts      Account[]
   sessions      Session[]
   chats         Chat[]
+  refreshTokens RefreshToken[]
   
   createdAt     DateTime  @default(now())
 
   @@map("Users")
+}
+
+model RefreshToken {
+  userId String
+  refreshToken String
+  expiresAt  DateTime
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([userId, refreshToken])
 }
 
 model Account {
@@ -49,6 +60,7 @@ model Account {
   @@map("Accounts")
 }
 
+// review
 model Session {
   sessionToken String   @unique
   userId       String
@@ -60,6 +72,7 @@ model Session {
   @@map("Sessions")
 }
 
+// review
 model VerificationToken {
   identifier String
   token      String

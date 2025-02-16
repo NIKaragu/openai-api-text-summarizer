@@ -38,8 +38,8 @@ export const authConfig = {
       if (account) {
         token.id = account.userId
         token.provider = account.provider;
-        token.accessToken = account.access_token;
-        token.refreshToken = account.refresh_token;
+        token.accessToken = account.access_token; //review
+        token.refreshToken = account.refresh_token; //review
       }
       return token;
     },
