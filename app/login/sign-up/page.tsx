@@ -17,7 +17,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="flex flex-col gap-6 items-center justify-center h-fit w-fit py-6 px-8 border border-primary rounded-lg">
+      <div className="flex flex-col gap-6 items-center justify-center h-fit max-w-96 w-full py-6 px-8 border border-primary rounded-lg">
         <h2
           className="text-2xl font-semibold pb-2 border-b border-primary highlighted-title"
           aria-label="Log in form`s name"
@@ -25,7 +25,7 @@ export default function Page() {
           Sign up
         </h2>
         <form
-          className="flex flex-col gap-6 mt-4 w-80"
+          className="flex flex-col gap-6 mt-4 w-full"
           aria-label="Log in form"
           action={formAction}
         >
@@ -56,7 +56,7 @@ export default function Page() {
             </Label>
             <Input
               type="password"
-              placeholder="Enter your assword"
+              placeholder="Enter your password"
               name="password"
               aria-labelledby="password-field"
             />
@@ -72,7 +72,7 @@ export default function Page() {
             </Label>
             <Input
               type="password"
-              placeholder="Confirm your assword"
+              placeholder="Confirm your password"
               name="confirmPassword"
               aria-labelledby="password-confirmation-field"
             />

@@ -4,11 +4,12 @@ import { authRoutes } from "./lib/auth/authRoutes";
 export const authConfig = {
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 15 * 60,
+    updateAge: 60,
   },
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user || !!auth?.account
+      const isLoggedIn = !!auth?.user || !!auth?.account;
       const isOnConversationPage = nextUrl.pathname.startsWith("/conversation");
       const isAuthRoute = authRoutes.some(
         (route) => nextUrl.pathname === route
@@ -33,21 +34,18 @@ export const authConfig = {
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
-        token.username = user.username ?? `user_${user.id}`;
       }
       if (account) {
-        token.id = account.userId
-        token.provider = account.provider;
-        token.accessToken = account.access_token; //review
-        token.refreshToken = account.refresh_token; //review
+        token.id = account.userId;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.username =
-          (token.username as string) ?? `user_${token.id}`;
+      }
+      if (session.account) {
+        session.account.userId = token.id as string;
       }
       return session;
     },

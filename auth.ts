@@ -5,28 +5,27 @@ import bcryptjs from "bcryptjs";
 import { authConfig } from "./auth.config";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
+import { GitHubProfile } from "next-auth/providers/github";
 import { prisma } from "./lib/prisma-client/prisma-client";
+import { GoogleProfile } from "next-auth/providers/google";
+import { randomUUID } from "crypto";
 
 declare module "next-auth" {
   interface User {
     id?: string;
-    username?: string;
   }
 
   interface Session {
     user: {
       id: string;
-      username?: string;
     };
     account: {
       userId: string;
-      username?: string;
     };
   }
 
   interface JWT {
     id: string;
-    username?: string;
   }
 }
 
@@ -64,26 +63,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      async profile(profile) {
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+      async profile(profile: GoogleProfile) {
         const user = await prisma.user.upsert({
-          where: { username: profile.email },
+          where: { email: profile.email },
           update: {},
           create: {
-            username: profile.email,
             email: profile.email,
             emailVerified: profile.email_verified,
             accounts: {
               create: {
                 provider: "google",
                 providerAccountId: String(profile.id),
-                access_token: profile.access_token
-                  ? String(profile.access_token)
-                  : null,
-                refresh_token: profile.refresh_token
-                  ? String(profile.refresh_token)
-                  : null,
                 type: "oauth",
-                expires_at: profile.exp,
+              },
+            },
+            refreshToken: {
+              create: {
+                refreshToken: profile.refresh_token || randomUUID(),
+                expiresAt: profile.exp,
               },
             },
           },
@@ -95,7 +99,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      async profile(profile) {
+      async profile(profile: GitHubProfile) {
         const user = await prisma.user.upsert({
           where: { username: profile.login },
           update: {},
@@ -105,13 +109,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               create: {
                 provider: "github",
                 providerAccountId: String(profile.id),
-                access_token: profile.access_token
-                  ? String(profile.access_token)
-                  : null,
-                refresh_token: profile.refresh_token
-                  ? String(profile.refresh_token)
-                  : null,
                 type: "oauth",
+              },
+            },
+            refreshToken: {
+              create: {
+                refreshToken: randomUUID(),
+                expiresAt: 2592000,
               },
             },
           },
