@@ -15,14 +15,13 @@ datasource db {
 
 model User {
   id            String    @id @default(uuid())
-  username      String   @unique
-  email         String?          @unique
+  username      String?   @unique
+  email         String?   @unique
   emailVerified Boolean?
   password      String?  
   accounts      Account[]
-  sessions      Session[]
   chats         Chat[]
-  refreshTokens RefreshToken[]
+  refreshToken   RefreshToken?
   
   createdAt     DateTime  @default(now())
 
@@ -30,63 +29,38 @@ model User {
 }
 
 model RefreshToken {
-  userId String
+  id           String @id @default(uuid())
   refreshToken String
-  expiresAt  DateTime
+  expiresAt    Int
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
 
-  @@id([userId, refreshToken])
+  @@map("RefreshTokens")
 }
 
 model Account {
-  userId            String
+  userId            String @unique
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
   session_state     String?
   
-  createdAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([provider, providerAccountId])
+  @@id([userId, provider, providerAccountId], name: "AccountId")
   @@map("Accounts")
-}
-
-// review
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt    DateTime @default(now())
-
-  @@map("Sessions")
-}
-
-// review
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-  @@map("VerificationTokens")
 }
 
 model Chat {
   id       Int    @id @default(autoincrement())
   chatName String @default("Chat")
   userId   String
-  owner    User   @relation(fields: [userId], references: [id])
+  owner    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages Message[]
 
   createdAt DateTime @default(now())
@@ -98,7 +72,7 @@ model Chat {
 model Message {
   id              Int    @default(autoincrement())
   chatId          Int
-  chat            Chat   @relation(fields: [chatId], references: [id])
+  chat            Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
   sender          Sender
   content         String
   isVersionActive Boolean @default(true)
