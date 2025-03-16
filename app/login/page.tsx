@@ -71,7 +71,7 @@ export default function Page() {
           action={async (formData) => {
             credentialsAction(formData);
 
-            redirect("/conversation");
+            redirect("/chat");
           }}
         >
           <div className="flex flex-col gap-2">
