@@ -46,7 +46,7 @@ export async function signUp(state: SignUpState, formData: FormData) {
   await signIn("credentials", {
     username,
     password,
-    redirectTo: "/conversation",
+    redirectTo: "/chat",
   });
 
   return { success: true, user: user };

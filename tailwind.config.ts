@@ -1,3 +1,4 @@
+import plugin from "tailwindcss/plugin";
 import type { Config } from "tailwindcss";
 import * as tlAnimate from "tailwindcss-animate";
 
@@ -57,7 +58,57 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      shadowSizes: {
+        sm: "0px 0px 2px",
+        md: "0px 0px 4px",
+        lg: "0px 0px 8px",
+      },
+      shadowColors: {
+        primary: "hsla(var(--primary))",
+        secondary: "hsla(var(--secondary))",
+        destructive: "hsla(var(--destructive))",
+        muted: "hsla(var(--muted))",
+        accent: "hsla(var(--accent))",
+        "chart-1": "hsla(var(--chart-1))",
+        "chart-2": "hsla(var(--chart-2))",
+      },
     },
   },
-  plugins: [tlAnimate],
+  plugins: [
+    tlAnimate,
+    plugin(({ matchUtilities, addUtilities, theme }) => {
+      const sizes = theme("shadowSizes");
+      const colors = theme("shadowColors");
+
+      if (!sizes || !colors) return;
+
+      matchUtilities(
+        {
+          "icon-shadow": (value) => ({
+            filter: `drop-shadow(${value})`,
+          }),
+        },
+        {
+          values: Object.fromEntries(
+            Object.entries(sizes).flatMap(([sizeKey, sizeValue]) =>
+              Object.entries(colors).map(([colorKey, colorValue]) => [
+                `${colorKey}-${sizeKey}`,
+                `${sizeValue} ${colorValue}`,
+              ])
+            )
+          ),
+        }
+      );
+
+      addUtilities({
+        ".no-scrollbar::-webkit-scrollbar": {
+          display: "none",
+        },
+        ".no-scrollbar": {
+          "-ms-overflow-style": "none", // Для IE і Edge
+          "scrollbar-width": "none", // Для Firefox
+        },
+      });
+    }),
+  ],
 } satisfies Config;

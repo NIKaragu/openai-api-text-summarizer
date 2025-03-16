@@ -33,7 +33,7 @@ export default function RootLayout({
             Touch to AI
           </h1>
         </header>
-        <main className="flex items-center justify-center h-full">
+        <main className="flex flex-1 items-center justify-center min-h-0 w-full">
           {children}
         </main>
         <Toaster />

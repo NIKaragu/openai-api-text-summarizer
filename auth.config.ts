@@ -10,7 +10,7 @@ export const authConfig = {
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user || !!auth?.account;
-      const isOnConversationPage = nextUrl.pathname.startsWith("/conversation");
+      const isOnChatPage = nextUrl.pathname.startsWith("/chat");
       const isAuthRoute = authRoutes.some(
         (route) => nextUrl.pathname === route
       );
@@ -19,14 +19,14 @@ export const authConfig = {
         return true;
       }
 
-      if (isOnConversationPage) {
+      if (isOnChatPage) {
         if (isLoggedIn) {
           return true;
         }
 
         return false;
-      } else if (isLoggedIn && !isOnConversationPage) {
-        return Response.redirect(new URL("/conversation", nextUrl.href));
+      } else if (isLoggedIn && !isOnChatPage) {
+        return Response.redirect(new URL("/chat", nextUrl.href));
       }
 
       return true;
@@ -53,7 +53,7 @@ export const authConfig = {
   pages: {
     signIn: "/login",
     signOut: "/",
-    newUser: "/conversation",
+    newUser: "/chat",
   },
   secret: process.env.AUTH_SECRET,
   providers: [],

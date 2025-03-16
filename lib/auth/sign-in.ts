@@ -58,9 +58,9 @@ export async function authenticate(
 }
 
 export async function signInWithGoogle() {
-  await signIn("google", { redirectTo: "/conversation", redirect: true });
+  await signIn("google", { redirectTo: "/chat", redirect: true });
 }
 
 export async function signInWithGithub() {
-  await signIn("github", { redirectTo: "/conversation", redirect: true });
+  await signIn("github", { redirectTo: "/chat", redirect: true });
 }
