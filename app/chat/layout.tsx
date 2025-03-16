@@ -11,10 +11,10 @@ export default function ChatLayout({
 }>) {
   return (
     <>
-      <aside className="flex min-w-32 max-w-80 w-1/4 h-full border border-t-0 border-l-0 border-primary rounded-br-lg box-border py-4 px-2">
+      <aside className="flex min-w-32 max-w-80 w-1/4 h-full border border-t-0 border-l-0 border-primary rounded-br-lg py-4 px-2">
         {chatsList}
       </aside>
-      <div className="flex flex-col flex-1 gap-12 justify-end items-center px-2 sm:px-8 xl:px-16 pt-2 sm:py-4 h-full">
+      <div className="flex flex-col flex-1 justify-end items-center px-2 sm:px-8 xl:px-16 sm:pb-4 h-full">
         {children}
         <SendMessageForm />
       </div>

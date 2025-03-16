@@ -76,7 +76,7 @@ export default {
   },
   plugins: [
     tlAnimate,
-    plugin(({ matchUtilities, theme }) => {
+    plugin(({ matchUtilities, addUtilities, theme }) => {
       const sizes = theme("shadowSizes");
       const colors = theme("shadowColors");
 
@@ -99,6 +99,16 @@ export default {
           ),
         }
       );
+
+      addUtilities({
+        ".no-scrollbar::-webkit-scrollbar": {
+          display: "none",
+        },
+        ".no-scrollbar": {
+          "-ms-overflow-style": "none", // Для IE і Edge
+          "scrollbar-width": "none", // Для Firefox
+        },
+      });
     }),
   ],
 } satisfies Config;
